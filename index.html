@@ -135,6 +135,7 @@ function resetImageAdjustments(){
  $('blackWhite').checked=false;$('bwThreshold').value=128;
 }
 function updateImagePreview(){
+ $('bwThresholdValue').textContent=`${$('bwThreshold').value} / 255`;
  if(!image)return;
  const left=Number($('cropLeft').value),top=Number($('cropTop').value);
  const right=Math.max(left+1,Number($('cropRight').value)),bottom=Math.max(top+1,Number($('cropBottom').value));
