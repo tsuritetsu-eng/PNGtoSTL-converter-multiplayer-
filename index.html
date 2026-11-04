@@ -30,10 +30,10 @@ footer{max-width:1200px;margin:auto;padding:0 22px 28px;color:var(--muted);font-
  <h3>画像のプレビュー・微調整</h3><p class="edit-help">ここで整えた画像がSTL変換に使われます。プレビューを見ながら必要な部分だけを残しましょう。</p>
  <div class="source-preview"><canvas id="imagePreview"></canvas></div>
  <div class="editor-grid">
-  <div class="crop-control"><label class="field"><span>左端 (%)</span><input id="cropLeft" type="range" min="0" max="80" value="0"></label><small>左側を切り取る量です。</small></div>
-  <div class="crop-control"><label class="field"><span>上端 (%)</span><input id="cropTop" type="range" min="0" max="80" value="0"></label><small>上側を切り取る量です。</small></div>
-  <div class="crop-control"><label class="field"><span>右端 (%)</span><input id="cropRight" type="range" min="20" max="100" value="100"></label><small>右端を残す位置です。値を下げると右側が切れます。</small></div>
-  <div class="crop-control"><label class="field"><span>下端 (%)</span><input id="cropBottom" type="range" min="20" max="100" value="100"></label><small>下端を残す位置です。値を下げると下側が切れます。</small></div>
+  <div class="crop-control"><label class="field"><span>左端 (%)</span><input id="cropLeft" type="range" min="0" max="80" value="0"><output id="cropLeftValue" class="range-value">0%</output></label><small>左側を切り取る量です。</small></div>
+  <div class="crop-control"><label class="field"><span>上端 (%)</span><input id="cropTop" type="range" min="0" max="80" value="0"><output id="cropTopValue" class="range-value">0%</output></label><small>上側を切り取る量です。</small></div>
+  <div class="crop-control"><label class="field"><span>右端 (%)</span><input id="cropRight" type="range" min="20" max="100" value="100"><output id="cropRightValue" class="range-value">100%</output></label><small>右端を残す位置です。値を下げると右側が切れます。</small></div>
+  <div class="crop-control"><label class="field"><span>下端 (%)</span><input id="cropBottom" type="range" min="20" max="100" value="100"><output id="cropBottomValue" class="range-value">100%</output></label><small>下端を残す位置です。値を下げると下側が切れます。</small></div>
  </div>
  <div class="bw-control"><label class="check"><input id="blackWhite" type="checkbox"> 完全な白黒（2階調）にする</label><small>灰色を白か黒に置き換えます。文字・ロゴ・図形をくっきりさせたいときに便利です。</small></div>
  <div class="bw-control"><label class="field"><span>白黒の境界</span><input id="bwThreshold" type="range" min="0" max="255" value="128"><output id="bwThresholdValue" class="range-value">128 / 255</output></label><small>この明るさ以上は白、それ未満は黒です。値を上げると黒い部分が増え、下げると白い部分が増えます。白黒化をオンにして調整してください。</small></div>
@@ -135,6 +135,7 @@ function resetImageAdjustments(){
  $('blackWhite').checked=false;$('bwThreshold').value=128;
 }
 function updateImagePreview(){
+ ['cropLeft','cropTop','cropRight','cropBottom'].forEach(id=>$(id+'Value').textContent=$(id).value+'%');
  $('bwThresholdValue').textContent=`${$('bwThreshold').value} / 255`;
  if(!image)return;
  const left=Number($('cropLeft').value),top=Number($('cropTop').value);
