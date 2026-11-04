@@ -31,15 +31,15 @@ footer{max-width:1200px;margin:auto;padding:0 22px 28px;color:var(--muted);font-
 <label class="mode"><input type="radio" name="mode" value="lithophane"><span><b>リソファン</b><small>写真の明暗を厚みに変換。背面から光を当てる用途</small></span></label>
 </div></div>
 <div><h2>03　モデル設定</h2><div class="stack">
-<label class="field"><span>モデル幅 (mm)</span><input id="width" type="number" min="1" max="500" step=".1" value="100"></label>
-<label class="field"><span>モデル高さ (mm)</span><input id="height" type="number" min="1" max="500" step=".1" value="100"></label>
+<label class="field"><span><b style="color:var(--accent)">X</b>　横幅 (mm)</span><input id="width" type="number" min="1" max="500" step=".1" value="100"></label>
+<label class="field"><span><b style="color:var(--accent)">Y</b>　縦幅 (mm)</span><input id="height" type="number" min="1" max="500" step=".1" value="100"></label>
 <label class="ratio-note"><input id="keepRatio" type="checkbox" checked> 画像の縦横比を維持して自動調整</label>
-<label class="field" id="thicknessRow"><span id="thicknessLabel">最大高さ (mm)</span><input id="thickness" type="number" min="0.5" max="30" step=".5" value="8"></label>
+<label class="field" id="thicknessRow"><span><b style="color:var(--accent)">Z</b>　<span id="thicknessLabel">厚み (mm)</span></span><input id="thickness" type="number" min="0.6" max="30" step=".5" value="8"></label>
 <label class="field" id="baseRow"><span>ベース厚 (mm)</span><input id="base" type="number" min="0.5" max="10" step=".5" value="2"></label>
 <label class="field"><span>メッシュ解像度</span><select id="resolution"><option value="80">低（軽量）</option><option value="140" selected>標準</option><option value="220">高（高精細）</option><option value="300">最高（重い）</option></select></label>
 <label class="field" id="thresholdRow"><span>輪郭しきい値</span><input id="threshold" type="number" min="1" max="254" value="128"></label>
 <label class="check" id="invertRow"><input id="invert" type="checkbox"> 明暗を反転する</label>
-</div><p class="hint" id="modeHint">白い部分ほど高く、黒い部分ほど低くなります。</p></div>
+</div><p class="hint" id="modeHint">白い部分ほど高く、黒い部分ほど低くなります。Zはモデル全体の最大厚みです。</p></div>
 <div class="actions"><button id="generate" disabled>3Dモデルを生成</button><button class="secondary" id="reset" type="button">設定リセット</button></div>
 <div class="status" id="status" aria-live="polite"></div>
 </section>
@@ -81,7 +81,7 @@ function updateMode(){
  $('thresholdRow').style.display=m==='silhouette'?'grid':'none';
  $('baseRow').style.display=m==='height'?'grid':'none';
  $('invertRow').style.display=m==='height'?'flex':'none';
- $('thicknessLabel').textContent=m==='silhouette'?'押し出し厚 (mm)':m==='lithophane'?'最大厚 (mm)':'最大高さ (mm)';
+ $('thicknessLabel').textContent=m==='silhouette'?'押し出し厚 (mm)':m==='lithophane'?'最大厚 (mm)':'全体の最大厚 (mm)';
  $('modeHint').textContent=m==='height'?'白い部分ほど高く、黒い部分ほど低くなります。':m==='silhouette'?'透明部分は除外し、しきい値より明るい部分を立体化します。':'暗い部分ほど厚く、明るい部分ほど薄くなります。薄い部分にも最小厚を確保します。';
 }
 document.querySelectorAll('input[name="mode"]').forEach(x=>x.addEventListener('change',updateMode));updateMode();
@@ -110,7 +110,7 @@ $('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.rem
 function number(id,min,max){const v=Number($(id).value);if(!Number.isFinite(v)||v<min||v>max)throw Error($(id).previousElementSibling?.textContent+' は '+min+'〜'+max+' の範囲で入力してください。');return v}
 function addTri(arr,a,b,c){arr.push(...a,...b,...c)}
 function makeGeometry(){
- const mode=selectedMode(),W=number('width',1,500),H=number('height',1,500),T=number('thickness',.5,30),base=mode==='height'?number('base',.5,10):0;
+ const mode=selectedMode(),W=number('width',1,500),H=number('height',1,500),T=number('thickness',.6,30),base=mode==='height'?number('base',.5,10):0;\n if(mode==='height'&&base>=T)throw Error('ベース厚はZ厚みより小さい値にしてください。');
  const maxRes=Number($('resolution').value),aspect=image.naturalWidth/image.naturalHeight;
  let nx,ny;if(aspect>=1){nx=maxRes;ny=Math.max(2,Math.round(maxRes/aspect))}else{ny=maxRes;nx=Math.max(2,Math.round(maxRes*aspect))}
  const c=document.createElement('canvas');c.width=nx;c.height=ny;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.clearRect(0,0,nx,ny);ctx.drawImage(image,0,0,nx,ny);
@@ -137,7 +137,7 @@ function makeGeometry(){
   const top=new Float32Array(nx*ny),bottom=new Float32Array(nx*ny);
   for(let y=0;y<ny;y++)for(let x=0;x<nx;x++){
    let g=gray(x,y);if($('invert').checked&&mode==='height')g=1-g;
-   top[y*nx+x]=mode==='height'?base+g*T:Math.max(.6,T*(1-g));
+   top[y*nx+x]=mode==='height'?base+g*(T-base):Math.max(.6,T*(1-g));
    bottom[y*nx+x]=mode==='height'?0:0;
   }
   const p=(x,y,z)=>[x0+x*xSize,y0+(ny-y)*ySize,z];
