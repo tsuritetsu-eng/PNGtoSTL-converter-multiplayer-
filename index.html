@@ -86,6 +86,19 @@ function init3D(){
  const light=new THREE.DirectionalLight(0xffffff,2.3);light.position.set(-80,-100,180);scene.add(light);
  camera.up.set(0,0,1);controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.075;controls.enableRotate=true;controls.enablePan=true;controls.screenSpacePanning=true;controls.rotateSpeed=.85;controls.panSpeed=.8;controls.minPolarAngle=.015;controls.maxPolarAngle=Math.PI-.015;controls.target.set(0,0,0);
  const grid=new THREE.GridHelper(300,30,0x647b9b,0x354966);grid.rotation.x=Math.PI/2;grid.position.z=-.03;grid.material.depthWrite=false;scene.add(grid);scene.userData.floorGrid=grid;
+ axisHelper=new THREE.Group();
+ const addInitialAxis=(dir,color,label)=>{
+  const arrow=new THREE.ArrowHelper(dir,new THREE.Vector3(0,0,0),58,color,5,1.8);
+  arrow.line.material.depthTest=false;arrow.cone.material.depthTest=false;arrow.renderOrder=5;axisHelper.add(arrow);
+  const c=document.createElement('canvas');c.width=128;c.height=128;const x=c.getContext('2d');
+  x.font='bold 88px system-ui';x.textAlign='center';x.textBaseline='middle';x.lineWidth=10;x.strokeStyle='#07101ddd';x.strokeText(label,64,66);x.fillStyle='#'+color.toString(16).padStart(6,'0');x.fillText(label,64,66);
+  const t=new THREE.CanvasTexture(c),sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false}));
+  sp.position.copy(dir).multiplyScalar(68);sp.scale.set(12,12,1);sp.renderOrder=6;axisHelper.add(sp);
+ };
+ addInitialAxis(new THREE.Vector3(1,0,0),0xff3030,'X');
+ addInitialAxis(new THREE.Vector3(0,1,0),0x28f06a,'Y');
+ addInitialAxis(new THREE.Vector3(0,0,1),0x398cff,'Z');
+ scene.add(axisHelper);
  const resize=()=>{const r=canvas.getBoundingClientRect();camera.aspect=r.width/Math.max(1,r.height);camera.updateProjectionMatrix();renderer.setSize(r.width,r.height,false)};
  new ResizeObserver(resize).observe(canvas.parentElement);resize();
  function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}animate();
