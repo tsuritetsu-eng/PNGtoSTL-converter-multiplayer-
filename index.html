@@ -85,7 +85,32 @@ function init3D(){
  scene.add(new THREE.HemisphereLight(0xddeeff,0x34415b,2));
  const light=new THREE.DirectionalLight(0xffffff,2.3);light.position.set(-80,-100,180);scene.add(light);
  camera.up.set(0,0,1);controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.075;controls.enableRotate=true;controls.enablePan=true;controls.screenSpacePanning=true;controls.rotateSpeed=.85;controls.panSpeed=.8;controls.minPolarAngle=.015;controls.maxPolarAngle=Math.PI-.015;controls.target.set(0,0,0);
- const grid=new THREE.GridHelper(300,30,0x647b9b,0x354966);grid.rotation.x=Math.PI/2;grid.position.z=-.03;grid.material.depthWrite=false;scene.add(grid);scene.userData.floorGrid=grid;
+ const measurementGroup=new THREE.Group();scene.add(measurementGroup);
+ const makeLabel=(text,x,y,z,size=8,color='#dce8f8')=>{
+  const c=document.createElement('canvas');c.width=256;c.height=96;const ctx=c.getContext('2d');
+  ctx.font='bold 40px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.lineWidth=7;ctx.strokeStyle='#08111ddd';ctx.strokeText(text,128,48);ctx.fillStyle=color;ctx.fillText(text,128,48);
+  const tex=new THREE.CanvasTexture(c),sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false}));
+  sp.position.set(x,y,z);sp.scale.set(size*2.7,size,1);sp.renderOrder=7;measurementGroup.add(sp);
+ };
+ const updateMeasurements=(w=300,h=300,model=false,z=-.04)=>{
+  while(measurementGroup.children.length){const o=measurementGroup.children.pop();if(o.material?.map)o.material.map.dispose();o.material?.dispose();o.removeFromParent()}
+  const halfX=Math.max(50,Math.ceil(w/100)*50),halfY=Math.max(50,Math.ceil(h/100)*50),step=10;
+  const positions=[],major=[];
+  for(let x=-halfX;x<=halfX+.001;x+=step){const arr=Math.abs(x%50)<.001?major:positions;arr.push(x,-halfY,z,x,halfY,z)}
+  for(let y=-halfY;y<=halfY+.001;y+=step){const arr=Math.abs(y%50)<.001?major:positions;arr.push(-halfX,y,z,halfX,y,z)}
+  const addLines=(arr,color,opacity)=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));const m=new THREE.LineBasicMaterial({color,transparent:true,opacity,depthWrite:false});measurementGroup.add(new THREE.LineSegments(g,m))};
+  addLines(positions,0x354966,.72);addLines(major,0x7189aa,.9);
+  for(let x=-halfX;x<=halfX;x+=50)if(x!==0)makeLabel(String(x),x,-7,z+0.2,6,'#ff9a9a');
+  for(let y=-halfY;y<=halfY;y+=50)if(y!==0)makeLabel(String(y),-7,y,z+0.2,6,'#8cf0ad');
+  makeLabel('X / mm',halfX+12,-7,z+0.2,7,'#ff7777');makeLabel('Y / mm',-7,halfY+12,z+0.2,7,'#72e99a');
+  if(model){
+   makeLabel('横幅 '+w.toFixed(1)+' mm',0,-halfY-18,z+0.2,9,'#ffffff');
+   makeLabel('縦幅 '+h.toFixed(1)+' mm',-halfX-20,0,z+0.2,9,'#ffffff');
+  }
+ };
+ updateMeasurements();
+ scene.userData.updateMeasurements=updateMeasurements;
  axisHelper=new THREE.Group();
  const addInitialAxis=(dir,color,label)=>{
   const arrow=new THREE.ArrowHelper(dir,new THREE.Vector3(0,0,0),58,color,5,1.8);
@@ -234,7 +259,7 @@ function makeGeometry(){
 $('generate').addEventListener('click',()=>{
  if(!image)return;try{$('status').textContent='モデルを生成しています…';$('generate').disabled=true;
   setTimeout(()=>{try{const result=makeGeometry();if(mesh){scene.remove(mesh);mesh.geometry.dispose()}mesh=new THREE.Mesh(result.geo,new THREE.MeshStandardMaterial({color:0x8de4cf,metalness:.18,roughness:.48,side:THREE.DoubleSide}));scene.add(mesh);
-  const box=new THREE.Box3().setFromObject(mesh),size=box.getSize(new THREE.Vector3());controls.target.copy(box.getCenter(new THREE.Vector3()));const span=Math.max(size.x,size.y,size.z);const floorGrid=scene.userData.floorGrid;if(floorGrid){floorGrid.position.z=box.min.z-.03;floorGrid.scale.setScalar(Math.max(1,span/150))}if(axisHelper){scene.remove(axisHelper);axisHelper.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose()}})}
+  const box=new THREE.Box3().setFromObject(mesh),size=box.getSize(new THREE.Vector3());controls.target.copy(box.getCenter(new THREE.Vector3()));const span=Math.max(size.x,size.y,size.z);scene.userData.updateMeasurements(result.W,result.H,true,box.min.z-.04);if(axisHelper){scene.remove(axisHelper);axisHelper.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose()}})}
 axisHelper=new THREE.Group();axisHelper.position.copy(box.min);const axisLen=span*.72,shaft=span*.009,head=span*.035;
 const addAxis=(dir,color,label)=>{const arrow=new THREE.ArrowHelper(dir,new THREE.Vector3(0,0,0),axisLen,color,head,shaft*2.2);arrow.line.material.depthTest=false;arrow.cone.material.depthTest=false;arrow.renderOrder=5;axisHelper.add(arrow);
 const cnv=document.createElement('canvas');cnv.width=128;cnv.height=128;const cx=cnv.getContext('2d');cx.clearRect(0,0,128,128);cx.font='bold 88px system-ui';cx.textAlign='center';cx.textBaseline='middle';cx.lineWidth=10;cx.strokeStyle='#07101ddd';cx.strokeText(label,64,66);cx.fillStyle='#'+color.toString(16).padStart(6,'0');cx.fillText(label,64,66);
