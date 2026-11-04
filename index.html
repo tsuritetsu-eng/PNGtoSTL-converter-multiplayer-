@@ -8,16 +8,16 @@
 :root{color-scheme:dark;--bg:#0b1020;--panel:#151d30;--panel2:#1d2940;--line:#2d3a54;--text:#eef3ff;--muted:#a7b4ca;--accent:#67e8c0;--accent2:#65a9ff}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#1d3452 0,transparent 55%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
 header{max-width:1200px;margin:auto;padding:28px 22px 12px}h1{font-size:clamp(26px,5vw,42px);line-height:1.1;margin:0 0 9px;letter-spacing:-.04em}h1 span{color:var(--accent)}header p{margin:0;color:var(--muted)}
-main{max-width:1200px;margin:auto;padding:16px 22px 48px;display:grid;grid-template-columns:minmax(290px,390px) 1fr;gap:18px}
+main{max-width:1200px;margin:auto;padding:16px 22px 48px;display:grid;grid-template-columns:minmax(290px,390px) minmax(0,1fr);gap:18px;align-items:start}
 .panel{background:linear-gradient(160deg,#19243a,#111a2b);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 18px 50px #0003}.panel h2{font-size:17px;margin:0 0 14px}
 .stack{display:grid;gap:15px}.drop{border:1.5px dashed #58708e;border-radius:14px;padding:22px 14px;text-align:center;background:#101a2b;cursor:pointer}.drop:hover,.drop.drag{border-color:var(--accent);background:#142b31}.drop strong{display:block;margin:7px 0 2px}.drop small,.hint{color:var(--muted);font-size:12px}input[type=file]{display:none}
 .modes{display:grid;gap:8px}.mode{display:flex;align-items:center;gap:11px;padding:10px;border:1px solid var(--line);border-radius:12px;cursor:pointer;background:#111b2c}.mode:has(input:checked){border-color:var(--accent);background:#153039}.mode input{accent-color:#67e8c0}.mode b{display:block}.mode small{display:block;color:var(--muted);font-size:12px}
-label.field{display:grid;grid-template-columns:1fr 100px;gap:10px;align-items:center;color:#dbe6f8;font-size:13px}input[type=number],select{width:100%;background:#0d1727;border:1px solid var(--line);border-radius:8px;padding:9px;color:var(--text);font:inherit}
+label.field{display:grid;grid-template-columns:minmax(0,1fr) minmax(88px,110px);gap:10px;align-items:center;color:#dbe6f8;font-size:13px}.ratio-note{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#101a2b;color:#dbe6f8;font-size:13px}.ratio-note input{accent-color:var(--accent)}input[type=number],select{width:100%;background:#0d1727;border:1px solid var(--line);border-radius:8px;padding:9px;color:var(--text);font:inherit}
 .check{display:flex;align-items:center;gap:8px;color:#dbe6f8;font-size:13px}.check input{accent-color:var(--accent)}
 button{border:0;border-radius:10px;padding:12px 16px;font:700 14px inherit;cursor:pointer;background:var(--accent);color:#09221d}button:disabled{opacity:.4;cursor:not-allowed}.secondary{background:#273750;color:var(--text);border:1px solid #3a4b67}.actions{display:flex;gap:9px;flex-wrap:wrap}.actions button{flex:1}
 .preview-panel{min-height:600px;display:flex;flex-direction:column}.preview-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.preview-head h2{margin:0}.viewer{position:relative;flex:1;min-height:420px;border-radius:13px;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#263b58,#0b1322 72%)}#view{position:absolute;inset:0;width:100%;height:100%;touch-action:none}.empty{position:absolute;inset:0;display:grid;place-content:center;text-align:center;color:var(--muted);pointer-events:none}.empty .cube{font-size:52px;opacity:.7}.stats{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:12px}.stats strong{color:var(--text)}.status{min-height:20px;color:var(--accent);font-size:12px;margin-top:5px}
 footer{max-width:1200px;margin:auto;padding:0 22px 28px;color:var(--muted);font-size:12px}
-@media(max-width:800px){main{grid-template-columns:1fr;padding:12px 14px 32px}header{padding:23px 16px 8px}.preview-panel{min-height:520px}.viewer{min-height:390px}}
+@media(max-width:800px){main{grid-template-columns:minmax(0,1fr);padding:10px 10px 24px;gap:12px}header{padding:18px 13px 8px}header p{font-size:13px}.panel{padding:13px;border-radius:14px}.panel h2{font-size:15px;margin-bottom:10px}.stack{gap:12px}.drop{padding:15px 10px}.preview-panel{min-height:0}.viewer{min-height: min(62vw,340px);height:300px}.preview-head{align-items:flex-start;flex-direction:column;gap:3px}.preview-head .hint{font-size:11px}.actions{gap:7px}.actions button{min-width:0;padding:11px 8px;font-size:13px}.stats{gap:8px 13px}.field{min-width:0}footer{padding:0 13px 22px}}@media(max-width:380px){body{font-size:14px}.panel{padding:11px}.viewer{height:250px;min-height:250px}label.field{grid-template-columns:minmax(0,1fr) 92px;gap:6px}input[type=number],select{padding:8px 6px;font-size:14px}}
 </style>
 </head>
 <body>
@@ -31,8 +31,9 @@ footer{max-width:1200px;margin:auto;padding:0 22px 28px;color:var(--muted);font-
 <label class="mode"><input type="radio" name="mode" value="lithophane"><span><b>リソファン</b><small>写真の明暗を厚みに変換。背面から光を当てる用途</small></span></label>
 </div></div>
 <div><h2>03　モデル設定</h2><div class="stack">
-<label class="field"><span>モデル幅 (mm)</span><input id="width" type="number" min="10" max="250" value="100"></label>
-<label class="field"><span>モデル高さ (mm)</span><input id="height" type="number" min="10" max="250" value="100"></label>
+<label class="field"><span>モデル幅 (mm)</span><input id="width" type="number" min="1" max="500" step=".1" value="100"></label>
+<label class="field"><span>モデル高さ (mm)</span><input id="height" type="number" min="1" max="500" step=".1" value="100"></label>
+<label class="ratio-note"><input id="keepRatio" type="checkbox" checked> 画像の縦横比を維持して自動調整</label>
 <label class="field" id="thicknessRow"><span id="thicknessLabel">最大高さ (mm)</span><input id="thickness" type="number" min="0.5" max="30" step=".5" value="8"></label>
 <label class="field" id="baseRow"><span>ベース厚 (mm)</span><input id="base" type="number" min="0.5" max="10" step=".5" value="2"></label>
 <label class="field"><span>メッシュ解像度</span><select id="resolution"><option value="80">低（軽量）</option><option value="140" selected>標準</option><option value="220">高（高精細）</option><option value="300">最高（重い）</option></select></label>
@@ -50,10 +51,13 @@ footer{max-width:1200px;margin:auto;padding:0 22px 28px;color:var(--muted);font-
 </section>
 </main>
 <footer>※画像処理とSTL生成はブラウザ内で実行されます。高解像度画像や高メッシュ設定では、端末によって処理に時間がかかる場合があります。生成データは一般的なSTL形式ですが、印刷前にスライサーで形状を確認してください。</footer>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-import { STLExporter } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/exporters/STLExporter.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 const $=id=>document.getElementById(id);
 let image=null,mesh=null,renderer,scene,camera,controls,exporter=new STLExporter();
 const canvas=$('view');
@@ -81,11 +85,21 @@ function updateMode(){
  $('modeHint').textContent=m==='height'?'白い部分ほど高く、黒い部分ほど低くなります。':m==='silhouette'?'透明部分は除外し、しきい値より明るい部分を立体化します。':'暗い部分ほど厚く、明るい部分ほど薄くなります。薄い部分にも最小厚を確保します。';
 }
 document.querySelectorAll('input[name="mode"]').forEach(x=>x.addEventListener('change',updateMode));updateMode();
+function syncDimension(changed){
+ if(!image||!$('keepRatio').checked)return;
+ const ratio=image.naturalWidth/image.naturalHeight;
+ if(changed==='width')$('height').value=(Number($('width').value)/ratio).toFixed(1);
+ else $('width').value=(Number($('height').value)*ratio).toFixed(1);
+}
+$('width').addEventListener('input',()=>syncDimension('width'));
+$('height').addEventListener('input',()=>syncDimension('height'));
+$('keepRatio').addEventListener('change',()=>{if($('keepRatio').checked&&image)syncDimension('width')});
+
 function loadFile(file){
- if(!file)return;if(!/^image\/(png|jpeg|webp)$/.test(file.type)){alert('PNG・JPEG・WebP画像を選択してください。');return}
+ if(!file)return;const ext=(file.name.split('.').pop()||'').toLowerCase();const supported=/^image\/(png|jpeg|webp)$/.test(file.type)||['png','jpg','jpeg','webp'].includes(ext);if(!supported){alert('PNG・JPEG・WebP画像を選択してください。');return}
  if(file.size>20*1024*1024){alert('画像は20MB以下にしてください。');return}
  const url=URL.createObjectURL(file),img=new Image();
- img.onload=()=>{image=img;$('fileName').textContent=file.name+' ('+img.naturalWidth+' × '+img.naturalHeight+' px)';$('generate').disabled=false;$('status').textContent='画像を読み込みました。立体化方式と設定を選択してください。';URL.revokeObjectURL(url)};
+ img.onload=()=>{image=img;$('fileName').textContent=file.name+' ( '+img.naturalWidth+' × '+img.naturalHeight+' px )';if($('keepRatio').checked)syncDimension('width');$('generate').disabled=false;$('status').textContent='画像を読み込みました。画像比率を反映した寸法を確認してください。';URL.revokeObjectURL(url)};
  img.onerror=()=>{URL.revokeObjectURL(url);alert('画像を読み込めませんでした。')};img.src=url;
 }
 $('file').addEventListener('change',e=>loadFile(e.target.files[0]));
@@ -148,7 +162,7 @@ $('generate').addEventListener('click',()=>{
  }catch(e){$('status').textContent=e.message;$('generate').disabled=false}
 });
 $('download').addEventListener('click',()=>{if(!mesh)return;try{const data=exporter.parse(mesh,{binary:true});const blob=new Blob([data],{type:'model/stl'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='image-to-stl-'+selectedMode()+'.stl';a.click();URL.revokeObjectURL(url);$('status').textContent='STLファイルをダウンロードしました。'}catch(e){$('status').textContent='STL出力に失敗しました: '+e.message}});
-$('reset').addEventListener('click',()=>{$('width').value=100;$('height').value=100;$('thickness').value=8;$('base').value=2;$('resolution').value=140;$('threshold').value=128;$('invert').checked=false;document.querySelector('input[value="height"]').checked=true;updateMode()});
+$('reset').addEventListener('click',()=>{$('width').value=100;$('height').value=100;$('keepRatio').checked=true;if(image)syncDimension('width');$('thickness').value=8;$('base').value=2;$('resolution').value=140;$('threshold').value=128;$('invert').checked=false;document.querySelector('input[value="height"]').checked=true;updateMode()});
 $('resetView').addEventListener('click',()=>{if(!mesh)return;const b=new THREE.Box3().setFromObject(mesh),s=b.getSize(new THREE.Vector3()),span=Math.max(s.x,s.y,s.z);controls.target.copy(b.getCenter(new THREE.Vector3()));camera.position.set(span*1.45,-span*1.7,span*1.35);camera.updateProjectionMatrix();controls.update()});
 </script>
 </body></html>
