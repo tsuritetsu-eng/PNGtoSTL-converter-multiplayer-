@@ -69,7 +69,7 @@ function init3D(){
  scene.add(new THREE.HemisphereLight(0xddeeff,0x34415b,2));
  const light=new THREE.DirectionalLight(0xffffff,2.3);light.position.set(-80,-100,180);scene.add(light);
  controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,0,0);
- const grid=new THREE.GridHelper(300,30,0x647b9b,0x354966);grid.rotation.x=Math.PI/2;grid.position.z=-.2;scene.add(grid);
+ const grid=new THREE.GridHelper(300,30,0x647b9b,0x354966);grid.rotation.x=Math.PI/2;grid.position.z=-.03;grid.material.depthWrite=false;scene.add(grid);scene.userData.floorGrid=grid;
  const resize=()=>{const r=canvas.getBoundingClientRect();camera.aspect=r.width/Math.max(1,r.height);camera.updateProjectionMatrix();renderer.setSize(r.width,r.height,false)};
  new ResizeObserver(resize).observe(canvas.parentElement);resize();
  function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}animate();
@@ -157,7 +157,7 @@ function makeGeometry(){
 $('generate').addEventListener('click',()=>{
  if(!image)return;try{$('status').textContent='モデルを生成しています…';$('generate').disabled=true;
   setTimeout(()=>{try{const result=makeGeometry();if(mesh){scene.remove(mesh);mesh.geometry.dispose()}mesh=new THREE.Mesh(result.geo,new THREE.MeshStandardMaterial({color:0x8de4cf,metalness:.18,roughness:.48,side:THREE.DoubleSide}));scene.add(mesh);
-  const box=new THREE.Box3().setFromObject(mesh),size=box.getSize(new THREE.Vector3());controls.target.copy(box.getCenter(new THREE.Vector3()));const span=Math.max(size.x,size.y,size.z);if(axisHelper){scene.remove(axisHelper);axisHelper.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose()}})}
+  const box=new THREE.Box3().setFromObject(mesh),size=box.getSize(new THREE.Vector3());controls.target.copy(box.getCenter(new THREE.Vector3()));const span=Math.max(size.x,size.y,size.z);const floorGrid=scene.userData.floorGrid;if(floorGrid){floorGrid.position.z=box.min.z-.03;floorGrid.scale.setScalar(Math.max(1,span/150))}if(axisHelper){scene.remove(axisHelper);axisHelper.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose()}})}
 axisHelper=new THREE.Group();axisHelper.position.copy(box.min);const axisLen=span*.72,shaft=span*.009,head=span*.035;
 const addAxis=(dir,color,label)=>{const arrow=new THREE.ArrowHelper(dir,new THREE.Vector3(0,0,0),axisLen,color,head,shaft*2.2);arrow.line.material.depthTest=false;arrow.cone.material.depthTest=false;arrow.renderOrder=5;axisHelper.add(arrow);
 const cnv=document.createElement('canvas');cnv.width=128;cnv.height=128;const cx=cnv.getContext('2d');cx.clearRect(0,0,128,128);cx.font='bold 88px system-ui';cx.textAlign='center';cx.textBaseline='middle';cx.lineWidth=10;cx.strokeStyle='#07101ddd';cx.strokeText(label,64,66);cx.fillStyle='#'+color.toString(16).padStart(6,'0');cx.fillText(label,64,66);
