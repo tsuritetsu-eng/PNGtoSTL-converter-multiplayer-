@@ -110,7 +110,8 @@ $('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.rem
 function number(id,min,max){const v=Number($(id).value);if(!Number.isFinite(v)||v<min||v>max)throw Error($(id).previousElementSibling?.textContent+' は '+min+'〜'+max+' の範囲で入力してください。');return v}
 function addTri(arr,a,b,c){arr.push(...a,...b,...c)}
 function makeGeometry(){
- const mode=selectedMode(),W=number('width',1,500),H=number('height',1,500),T=number('thickness',.6,30),base=mode==='height'?number('base',.5,10):0;\n if(mode==='height'&&base>=T)throw Error('ベース厚はZ厚みより小さい値にしてください。');
+ const mode=selectedMode(),W=number('width',1,500),H=number('height',1,500),T=number('thickness',.6,30),base=mode==='height'?number('base',.5,10):0;
+ if(mode==='height'&&base>=T)throw Error('ベース厚はZ厚みより小さい値にしてください。');
  const maxRes=Number($('resolution').value),aspect=image.naturalWidth/image.naturalHeight;
  let nx,ny;if(aspect>=1){nx=maxRes;ny=Math.max(2,Math.round(maxRes/aspect))}else{ny=maxRes;nx=Math.max(2,Math.round(maxRes*aspect))}
  const c=document.createElement('canvas');c.width=nx;c.height=ny;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.clearRect(0,0,nx,ny);ctx.drawImage(image,0,0,nx,ny);
