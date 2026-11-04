@@ -45,7 +45,7 @@ footer{max-width:1200px;margin:auto;padding:0 22px 28px;color:var(--muted);font-
 </section>
 <section class="panel preview-panel">
 <div class="preview-head"><h2>04　3Dプレビュー</h2><div class="preview-head-actions"><span class="hint">ドラッグ：回転 ／ ホイール：拡大縮小</span><button class="secondary fullscreen-btn" id="fullscreenPreview" type="button">⛶ 全画面</button></div></div>
-<div class="view-presets" id="viewPresets"><button class="secondary" data-view="front" type="button">前</button><button class="secondary" data-view="back" type="button">後</button><button class="secondary" data-view="left" type="button">左</button><button class="secondary" data-view="right" type="button">右</button><button class="secondary" data-view="top" type="button">上</button><button class="secondary" data-view="bottom" type="button">下</button><button class="secondary active" data-view="iso" type="button">斜め</button><button class="secondary" data-view="corner" type="button">角から</button></div>
+<div class="view-presets" id="viewPresets"><button class="secondary" data-view="front" type="button">前</button><button class="secondary" data-view="back" type="button">後</button><button class="secondary" data-view="left" type="button">左</button><button class="secondary" data-view="right" type="button">右</button><button class="secondary" data-view="top" type="button">上</button><button class="secondary" data-view="bottom" type="button">下</button><button class="secondary active" data-view="iso" type="button">斜め</button><button class="secondary" data-view="corner" type="button">角から</button><button class="secondary" data-view="topFront" type="button">上斜め前</button><button class="secondary" data-view="topBack" type="button">上斜め後</button><button class="secondary" data-view="topLeft" type="button">上斜め左</button><button class="secondary" data-view="topRight" type="button">上斜め右</button></div>
 <div class="viewer"><canvas id="view"></canvas><div class="axis-legend"><span><i class="axis-dot" style="background:#ff3030"></i>X：横</span><span><i class="axis-dot" style="background:#28f06a"></i>Y：縦</span><span><i class="axis-dot" style="background:#398cff"></i>Z：厚み</span></div><div class="empty" id="empty"><div class="cube">⬡</div><b>ここに3Dモデルが表示されます</b><small>画像を選択して「3Dモデルを生成」してください</small></div></div>
 <div class="stats"><span>三角形数：<strong id="triangles">—</strong></span><span>寸法：<strong id="dimensions">—</strong></span><span>形式：<strong>Binary STL</strong></span></div>
 <div class="actions" style="margin-top:14px"><button id="download" disabled>↓ STLをダウンロード</button><button class="secondary" id="resetView" type="button">視点をリセット</button></div>
@@ -69,7 +69,7 @@ function init3D(){
  renderer.outputColorSpace=THREE.SRGBColorSpace;
  scene.add(new THREE.HemisphereLight(0xddeeff,0x34415b,2));
  const light=new THREE.DirectionalLight(0xffffff,2.3);light.position.set(-80,-100,180);scene.add(light);
- controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,0,0);
+ camera.up.set(0,0,1);controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.075;controls.enableRotate=true;controls.enablePan=true;controls.screenSpacePanning=true;controls.rotateSpeed=.85;controls.panSpeed=.8;controls.minPolarAngle=.015;controls.maxPolarAngle=Math.PI-.015;controls.target.set(0,0,0);
  const grid=new THREE.GridHelper(300,30,0x647b9b,0x354966);grid.rotation.x=Math.PI/2;grid.position.z=-.03;grid.material.depthWrite=false;scene.add(grid);scene.userData.floorGrid=grid;
  const resize=()=>{const r=canvas.getBoundingClientRect();camera.aspect=r.width/Math.max(1,r.height);camera.updateProjectionMatrix();renderer.setSize(r.width,r.height,false)};
  new ResizeObserver(resize).observe(canvas.parentElement);resize();
@@ -80,9 +80,9 @@ function setViewPreset(name){
  currentView=name;
  const target=controls.target.clone();
  const distance=Math.max(camera.position.distanceTo(target),1);
- const dirs={front:new THREE.Vector3(0,-1,0),back:new THREE.Vector3(0,1,0),left:new THREE.Vector3(-1,0,0),right:new THREE.Vector3(1,0,0),top:new THREE.Vector3(0,0,1),bottom:new THREE.Vector3(0,0,-1),iso:new THREE.Vector3(1,-1,1).normalize(),corner:new THREE.Vector3(1,-1,1).normalize()};
+ const dirs={front:new THREE.Vector3(0,-1,0),back:new THREE.Vector3(0,1,0),left:new THREE.Vector3(-1,0,0),right:new THREE.Vector3(1,0,0),top:new THREE.Vector3(0,0,1),bottom:new THREE.Vector3(0,0,-1),iso:new THREE.Vector3(1,-1,1.25).normalize(),corner:new THREE.Vector3(1,-1,1.6).normalize(),topFront:new THREE.Vector3(.7,-1,2.5).normalize(),topBack:new THREE.Vector3(-.7,1,2.5).normalize(),topLeft:new THREE.Vector3(-2,-.7,2.3).normalize(),topRight:new THREE.Vector3(2,-.7,2.3).normalize()};
  const dir=dirs[name]||dirs.iso;
- camera.up=(name==='top'||name==='bottom')?new THREE.Vector3(0,1,0):new THREE.Vector3(0,0,1);
+ camera.up.set(0,0,1);
  camera.position.copy(target).addScaledVector(dir,distance);
  camera.lookAt(target);camera.updateProjectionMatrix();controls.update();
  document.querySelectorAll('#viewPresets button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
